@@ -2,24 +2,105 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Locations of rick and Morty</ion-title>
+        <ion-title>Locations of Rick and Morty</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Tab 2</ion-title>
-        </ion-toolbar>
-      </ion-header>
 
-      <ExploreContainer name="Tab 2 page" />
+    <ion-content :fullscreen="true">
+      <div id="content_page">
+        <div id="izquierda">
+          <ion-accordion-group>
+            <ion-accordion v-for="dimension in dimensions" :key="dimension.dimension">
+              <ion-item slot="header">
+                <ion-label>{{ dimension.dimension }}</ion-label>
+              </ion-item>
+              <ion-card v-for="location in dimension.locations" :key="location.id">
+                <ion-card-header>
+                  <ion-card-title>{{ location.name }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <p>Type: {{ location.type }}</p>
+                  <p>Residents: {{ location.residents.length }}</p>
+                </ion-card-content>
+              </ion-card>
+            </ion-accordion>
+          </ion-accordion-group>
+        </div>
+      </div>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-  import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
-  import ExploreContainer from '@/components/ExploreContainer.vue';
+import { ref, onMounted } from 'vue';
+import { 
+  IonPage, 
+  IonHeader, 
+  IonToolbar, 
+  IonTitle, 
+  IonContent, 
+  IonCard, 
+  IonAccordion, 
+  IonAccordionGroup, 
+  IonLabel, 
+  IonItem,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent 
+} from '@ionic/vue';
+import '../theme/tab2Page.css';
 
-  const locations = "https://rickandmortyapi.com/api/location"
+const dimensions = ref([]);
+
+async function fetchLocations() {
+  try {
+    let page = 1;
+    let fetchMore = true;
+    const allLocations = [];
+
+    while (fetchMore) {
+      const response = await fetch(`https://rickandmortyapi.com/api/location?page=${page}`);
+      const data = await response.json();
+      
+      const locations = data.results;
+      allLocations.push(...locations);
+      
+      if (data.info.next) {
+        page++;
+      } else {
+        fetchMore = false;
+      }
+    }
+
+    const dimensionsMap = new Map();
+
+    allLocations.forEach(location => {
+      const dimension = location.dimension;
+      const locationInfo = {
+        id: location.id,
+        name: location.name,
+        type: location.type,
+        residents: location.residents
+      };
+
+      if (!dimensionsMap.has(dimension)) {
+        dimensionsMap.set(dimension, {
+          dimension: dimension,
+          locations: []
+        });
+      }
+
+      dimensionsMap.get(dimension).locations.push(locationInfo);
+    });
+
+    dimensions.value = Array.from(dimensionsMap.values());
+    console.log(dimensions.value[0].locations)
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+  }
+}
+
+onMounted(() => {
+  fetchLocations();
+});
 </script>
