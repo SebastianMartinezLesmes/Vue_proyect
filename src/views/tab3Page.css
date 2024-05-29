@@ -1,0 +1,6 @@
+#list_characters{
+    padding: 0.2%;
+    display: flex;
+    justify-content: space-evenly;
+    --background: red;
+}
