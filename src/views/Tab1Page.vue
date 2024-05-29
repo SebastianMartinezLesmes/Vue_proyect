@@ -59,7 +59,7 @@ import {
   IonSearchbar,
   IonButton, 
 } from '@ionic/vue';
-import './tab1Page.css';
+import '../theme/tab1Page.css';
 
 const characters = ref([]);
 const selectedCharacter = ref(null);

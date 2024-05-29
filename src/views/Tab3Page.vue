@@ -18,14 +18,14 @@
             <ion-label>{{ episode.name }}</ion-label>
           </ion-item>
           <div class="ion-padding" slot="content">
-            <p><strong>Air Date:</strong> {{ episode.air_date }}</p>
-            <p><strong>Characters:</strong></p>
-            <ion-list>
-              <ion-item v-for="character in episode.characters" :key="character.id" id="list_characters">
-                <img :src="character.character_img" alt="Character Image" style="width: 50px; height: 50px; border-radius: 50%;">
-                <ion-label>{{ character.character_name }}</ion-label>
+            <p id="text_out_time"><strong> Air Date:</strong> {{ episode.air_date }}</p>
+            <p id="text_out_time2"><strong>Characters:</strong></p>
+            <div id="item_contenedor">
+              <ion-item lines="none" v-for="character in episode.characters" :key="character.id" id="list_characters">
+                <img slot="start" :src="character.character_img" alt="Character Image" id="img">
+                <ion-label slot="end">{{ character.character_name }}</ion-label>
               </ion-item>
-            </ion-list>
+            </div>
           </div>
         </ion-accordion>
       </ion-accordion-group>
@@ -43,11 +43,10 @@ import {
   IonContent, 
   IonAccordionGroup, 
   IonAccordion, 
-  IonItem, 
   IonLabel, 
-  IonList 
+  IonItem,
 } from '@ionic/vue';
-import './tab3Page.css'
+import '../theme/tab3Page.css';
 
 const episodes = ref([]);
 
@@ -91,7 +90,3 @@ onMounted(() => {
   fetchAllEpisodes();
 });
 </script>
-
-<style scoped>
-/* Puedes agregar estilos personalizados aquí si lo deseas */
-</style>
