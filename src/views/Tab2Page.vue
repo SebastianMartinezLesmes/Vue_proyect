@@ -25,6 +25,7 @@
           </ion-accordion-group>
         </div>
         <div id="derecha" v-if="LocationSelected">
+          <ion-button id="button_Clear_residents" @click="clear()"> <h2> Close </h2> </ion-button>
           <h2>{{ LocationSelected.name }}</h2>
           <h2>Type: {{ LocationSelected.type }}</h2>
           <h2>Dimension: {{ LocationSelected.dimension }}</h2>
@@ -148,6 +149,10 @@ async function getDatesLocation(location: Location) {
   } catch (error) {
     console.error('Error fetching resident details:', error);
   }
+}
+
+async function clear() {
+  LocationSelected.value = null;
 }
 
 onMounted(() => {

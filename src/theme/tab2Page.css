@@ -22,7 +22,7 @@
 }
 
 #acordeon_header{
-    color: rgb(81, 255, 0);
+    color: rgb(60, 255, 0);
 }
 
 #acordeon_content{
@@ -46,11 +46,20 @@
     border-top-left-radius: 15px;
     border-bottom-left-radius: 15px;
     background: rgba(195, 0, 255, 0.404);
-
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+}
+
+#button_Clear_residents{
+    width: 100%;
+    height: 5%;
+    --background: rgba(225, 0, 255, 0.514);
+}
+
+#button_Clear_residents h2 {
+    color: white;
 }
 
 #list_residents{
