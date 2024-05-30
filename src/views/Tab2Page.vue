@@ -10,24 +10,31 @@
       <div id="content_page">
         <div id="izquierda">
           <ion-accordion-group>
-            <ion-accordion v-for="dimension in dimensions" :key="dimension.dimension">
-              <ion-item slot="header">
+            <ion-accordion v-for="dimension in dimensions" :key="dimension.dimension" >
+              <ion-item slot="header" id="acordeon_header">
                 <ion-label>{{ dimension.dimension }}</ion-label>
               </ion-item>
-              <ion-list slot="content">
-                <ion-item v-for="location in dimension.locations" :key="location.id">
-                  <ion-label>
+              <ion-list slot="content" id="acordeon_content">
+                <ion-item lines="none" v-for="location in dimension.locations" :key="location.id" id="acordeon_label">
+                  <ion-label @click="getDatesLocation(location)">
                     <h2>{{ location.name }}</h2>
-                    <p>Type: {{ location.type }}</p>
-                    <p>Residents: {{ location.residents.length }}</p>
                   </ion-label>
                 </ion-item>
               </ion-list>
             </ion-accordion>
           </ion-accordion-group>
         </div>
-        <div id="derecha">
-
+        <div id="derecha" v-if="LocationSelected">
+          <h2>{{ LocationSelected.name }}</h2>
+          <h2>Type: {{ LocationSelected.type }}</h2>
+          <h2>Dimension: {{ LocationSelected.dimension }}</h2>
+          <h3>Residents:</h3>
+          <ul id="list_residents">
+            <ion-card v-for="resident in LocationSelected.residentsDetails" :key="resident.id">
+              <img :src="resident.image" alt="Resident image" width="50">
+              <h2>{{ resident.name }}</h2>
+            </ion-card>
+          </ul>
         </div>
       </div>
     </ion-content>
@@ -47,19 +54,23 @@ import {
   IonLabel, 
   IonItem,
   IonList,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent 
+  IonCard,
 } from '@ionic/vue';
 import '../theme/tab2Page.css';
 
-// Define interfaces for Location and Dimension
+interface Resident {
+  id: number;
+  name: string;
+  image: string;
+}
+
 interface Location {
   id: number;
   name: string;
   type: string;
-  residents: string[];
   dimension: string;
+  residents: string[];
+  residentsDetails: Resident[]; // New field for resident details
 }
 
 interface Dimension {
@@ -68,6 +79,7 @@ interface Dimension {
 }
 
 const dimensions = ref<Dimension[]>([]);
+const LocationSelected = ref<Location | null>(null);
 
 async function fetchLocations() {
   try {
@@ -83,8 +95,9 @@ async function fetchLocations() {
         id: loc.id,
         name: loc.name,
         type: loc.type,
+        dimension: loc.dimension,
         residents: loc.residents,
-        dimension: loc.dimension 
+        residentsDetails: [] // Initialize with empty array
       }));
       allLocations.push(...locations);
       
@@ -109,9 +122,31 @@ async function fetchLocations() {
     });
 
     dimensions.value = Array.from(dimensionsMap.values());
-    console.log(dimensions.value); // Log the dimensions to verify structure
   } catch (error) {
     console.error('Error fetching locations:', error);
+  }
+}
+
+async function getDatesLocation(location: Location) {
+  LocationSelected.value = location;
+  console.log(LocationSelected.value);
+
+  try {
+    const residentsDetails: Resident[] = await Promise.all(
+      location.residents.map(async (residentUrl) => {
+        const response = await fetch(residentUrl);
+        const data = await response.json();
+        return {
+          id: data.id,
+          name: data.name,
+          image: data.image
+        };
+      })
+    );
+
+    LocationSelected.value = { ...LocationSelected.value, residentsDetails };
+  } catch (error) {
+    console.error('Error fetching resident details:', error);
   }
 }
 
@@ -119,3 +154,4 @@ onMounted(() => {
   fetchLocations();
 });
 </script>
+
