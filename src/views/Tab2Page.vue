@@ -14,17 +14,20 @@
               <ion-item slot="header">
                 <ion-label>{{ dimension.dimension }}</ion-label>
               </ion-item>
-              <ion-card v-for="location in dimension.locations" :key="location.id">
-                <ion-card-header>
-                  <ion-card-title>{{ location.name }}</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <p>Type: {{ location.type }}</p>
-                  <p>Residents: {{ location.residents.length }}</p>
-                </ion-card-content>
-              </ion-card>
+              <ion-list slot="content">
+                <ion-item v-for="location in dimension.locations" :key="location.id">
+                  <ion-label>
+                    <h2>{{ location.name }}</h2>
+                    <p>Type: {{ location.type }}</p>
+                    <p>Residents: {{ location.residents.length }}</p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
             </ion-accordion>
           </ion-accordion-group>
+        </div>
+        <div id="derecha">
+
         </div>
       </div>
     </ion-content>
@@ -39,11 +42,11 @@ import {
   IonToolbar, 
   IonTitle, 
   IonContent, 
-  IonCard, 
   IonAccordion, 
   IonAccordionGroup, 
   IonLabel, 
   IonItem,
+  IonList,
   IonCardHeader,
   IonCardTitle,
   IonCardContent 
@@ -56,7 +59,7 @@ interface Location {
   name: string;
   type: string;
   residents: string[];
-  dimension: string; // Add dimension here to ensure it is available
+  dimension: string;
 }
 
 interface Dimension {
@@ -81,7 +84,7 @@ async function fetchLocations() {
         name: loc.name,
         type: loc.type,
         residents: loc.residents,
-        dimension: loc.dimension // Ensure dimension is included
+        dimension: loc.dimension 
       }));
       allLocations.push(...locations);
       
@@ -106,6 +109,7 @@ async function fetchLocations() {
     });
 
     dimensions.value = Array.from(dimensionsMap.values());
+    console.log(dimensions.value); // Log the dimensions to verify structure
   } catch (error) {
     console.error('Error fetching locations:', error);
   }
