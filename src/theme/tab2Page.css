@@ -12,11 +12,10 @@
 #izquierda{
     height: 100%;
     width: 30%;
-    --background: red;
 }
 
 #derecha{
     height: 100%;
     width: 30%;
-    --background: red;
+    background: red;
 }

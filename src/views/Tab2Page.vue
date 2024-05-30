@@ -50,19 +50,39 @@ import {
 } from '@ionic/vue';
 import '../theme/tab2Page.css';
 
-const dimensions = ref([]);
+// Define interfaces for Location and Dimension
+interface Location {
+  id: number;
+  name: string;
+  type: string;
+  residents: string[];
+  dimension: string; // Add dimension here to ensure it is available
+}
+
+interface Dimension {
+  dimension: string;
+  locations: Location[];
+}
+
+const dimensions = ref<Dimension[]>([]);
 
 async function fetchLocations() {
   try {
     let page = 1;
     let fetchMore = true;
-    const allLocations = [];
+    const allLocations: Location[] = [];
 
     while (fetchMore) {
       const response = await fetch(`https://rickandmortyapi.com/api/location?page=${page}`);
       const data = await response.json();
       
-      const locations = data.results;
+      const locations = data.results.map((loc: any): Location => ({
+        id: loc.id,
+        name: loc.name,
+        type: loc.type,
+        residents: loc.residents,
+        dimension: loc.dimension // Ensure dimension is included
+      }));
       allLocations.push(...locations);
       
       if (data.info.next) {
@@ -72,29 +92,20 @@ async function fetchLocations() {
       }
     }
 
-    const dimensionsMap = new Map();
+    const dimensionsMap = new Map<string, Dimension>();
 
     allLocations.forEach(location => {
       const dimension = location.dimension;
-      const locationInfo = {
-        id: location.id,
-        name: location.name,
-        type: location.type,
-        residents: location.residents
-      };
-
       if (!dimensionsMap.has(dimension)) {
         dimensionsMap.set(dimension, {
           dimension: dimension,
           locations: []
         });
       }
-
-      dimensionsMap.get(dimension).locations.push(locationInfo);
+      dimensionsMap.get(dimension)!.locations.push(location);
     });
 
     dimensions.value = Array.from(dimensionsMap.values());
-    console.log(dimensions.value[0].locations)
   } catch (error) {
     console.error('Error fetching locations:', error);
   }
